@@ -78,3 +78,11 @@ Contact:
 
 MIT license. See the license file.
 Anyone can use or modify this software for their purposes.
+
+## go build
+```shell
+abigen --sol DiamondLoupeFacet.sol --pkg generated --out ./generated/DiamondLoupeFacet.go
+abigen --sol Diamond.sol --pkg generated --out ./generated/Diamond.go
+abigen --sol OwnershipFacet.sol --pkg generated --out ./generated/OwnershipFacet.go
+```
+
