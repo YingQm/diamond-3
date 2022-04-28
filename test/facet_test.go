@@ -5,7 +5,8 @@ import (
 	"crypto/ecdsa"
 	"errors"
 	"fmt"
-	"github.com/YingQm/diamond-3/contracts/facets/DiamondCutFacetCut"
+	"github.com/YingQm/diamond-3/contracts/facets/DiamondCutFacet"
+	"github.com/YingQm/diamond-3/contracts/facets/DiamondLoupeFacet"
 	"github.com/YingQm/diamond-3/test/ethinterface"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
@@ -100,13 +101,13 @@ func PrepareAuth(client ethinterface.EthClientSpec, privateKey *ecdsa.PrivateKey
 }
 
 // DeployDiamondCutFacet
-func DeployDiamondCutFacet(client ethinterface.EthClientSpec, privateKey *ecdsa.PrivateKey, deployer common.Address) (*DiamondCutFacetCut.DiamondCutFacet, *DeployResult, error) {
+func DeployDiamondCutFacet(client ethinterface.EthClientSpec, privateKey *ecdsa.PrivateKey, deployer common.Address) (*DiamondCutFacet.DiamondCutFacet, *DeployResult, error) {
 	auth, err := PrepareAuth(client, privateKey, deployer)
 	if nil != err {
 		return nil, nil, err
 	}
 
-	addr, tx, DiamondCutFacet, err := DiamondCutFacetCut.DeployDiamondCutFacet(auth, client)
+	addr, tx, diamondCutFacet, err := DiamondCutFacet.DeployDiamondCutFacet(auth, client)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -116,7 +117,26 @@ func DeployDiamondCutFacet(client ethinterface.EthClientSpec, privateKey *ecdsa.
 		TxHash:  tx.Hash().String(),
 	}
 
-	return DiamondCutFacet, deployResult, nil
+	return diamondCutFacet, deployResult, nil
+}
+
+func DeployDiamondLoupeFacet(client ethinterface.EthClientSpec, privateKey *ecdsa.PrivateKey, deployer common.Address) (*DiamondLoupeFacet.DiamondLoupeFacet, *DeployResult, error) {
+	auth, err := PrepareAuth(client, privateKey, deployer)
+	if nil != err {
+		return nil, nil, err
+	}
+
+	addr, tx, diamondLoupeFacet, err := DiamondLoupeFacet.DeployDiamondLoupeFacet(auth, client)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	deployResult := &DeployResult{
+		Address: addr,
+		TxHash:  tx.Hash().String(),
+	}
+
+	return diamondLoupeFacet, deployResult, nil
 }
 
 //// DeployDiamond
@@ -156,8 +176,11 @@ func Test_DeployContracts(t *testing.T){
 	//x2EthContracts.Valset, deployInfo.Valset, err = DeployValset(client, para.DeployPrivateKey, para.Deployer, para.Operator, para.InitValidators, para.InitPowers)
 
 
-	DiamondCutFacet, deployResult,err:=DeployDiamondCutFacet(sim,para.DeployPrivateKey, para.Deployer)
-	fmt.Println(DiamondCutFacet, deployResult,err)
+	diamondCutFacet, deployResult,err:=DeployDiamondCutFacet(sim,para.DeployPrivateKey, para.Deployer)
+	fmt.Println(diamondCutFacet, deployResult,err)
+
+	diamondLoupeFacet, deployResult,err:=DeployDiamondLoupeFacet(sim,para.DeployPrivateKey, para.Deployer)
+	fmt.Println(diamondLoupeFacet, deployResult,err)
 
 	//opts, _ := bind.NewKeyedTransactorWithChainID(para.DeployPrivateKey, big.NewInt(1337))
 	//parsed, _ := abi.JSON(strings.NewReader(generated.DiamondMetaData.Bin))
